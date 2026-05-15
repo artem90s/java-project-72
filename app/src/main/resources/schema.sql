@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS urls;
 
-CREATE TABLE urls (
-                         id INT PRIMARY KEY AUTO_INCREMENT,
-                         name VARCHAR(255) NOT NULL,
-                         created_at TIMESTAMP
+CREATE TABLE urls
+(
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    name       VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP
 );

@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
@@ -36,6 +37,9 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
         app.get("/", ctx -> ctx.render("index.jte"));
+        app.get("/urls", UrlsController::getALl);
+        app.get("/urls/{id}", UrlsController::getById);
+        app.post("/urls", UrlsController::add);
         log.info("Cоздан обьект Javalin");
         return app;
     }

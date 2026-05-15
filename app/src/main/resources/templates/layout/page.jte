@@ -4,7 +4,7 @@
 @param BasePage page = null
 
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -18,16 +18,18 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" href="#">Анализатор страниц</a>
+            <a class="nav-link" href="/">Анализатор страниц</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Сайты</a>
+            <a class="nav-link" href="/urls">Сайты</a>
         </li>
     </ul>
 </nav>
 <main class="container">
     @if(page != null && page.getFlash() != null)
-        <p>${page.getFlash()}</p>
+        <div class="alert alert-success" role="alert">
+            ${page.getFlash()}
+        </div>
     @endif
     ${content}
 </main>
