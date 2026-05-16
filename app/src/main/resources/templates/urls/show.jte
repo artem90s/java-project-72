@@ -4,8 +4,8 @@
 @template.layout.page(
 page = page,
 content = @`
-    <h1 class="mb-4">Сайт: ${page.getUrl().getName()}</h1>
-
+    <div class="mb-5">
+        <h1 class="mb-4">Сайт: ${page.getUrl().getName()}</h1>
         <table class="table table-striped table-bordered" data-test="url">
             <tbody>
             <tr>
@@ -22,6 +22,36 @@ content = @`
             </tr>
             </tbody>
         </table>
+    </div>
 
+    <div>
+        <h1 class="mb-4">Проверки</h1>
+        <form  class="mb-4" method="post" action="/urls/${page.getUrl().getId()}/checks">
+            <input class="btn btn-primary" type="submit" value="Запустить проверку">
+        </form>
+
+        <table  class="table table-striped table-bordered" data-test="checks">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Код ответа</th>
+                <th>h1</th>
+                <th>title</th>
+                <th>description</th>
+                <th>Дата создания</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>1</td>
+                <td>200</td>
+                <td>...</td>
+                <td>...</td>
+                <td>...</td>
+                <td>2024-01-01</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 `
 )
