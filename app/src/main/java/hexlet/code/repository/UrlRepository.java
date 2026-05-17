@@ -1,6 +1,7 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -12,6 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class UrlRepository extends BaseRepository {
+
+    private static final String GET_ALL_URLS_SQL =
+            "SELECT u.*, c.status_code, c.created_at as last_check "
+                    + "FROM urls u "
+                    + "LEFT JOIN url_checks c ON u.id = c.url_id "
+                    + "WHERE c.created_at = (SELECT MAX(created_at) FROM url_checks WHERE url_id = u.id) "
+                    + "OR c.created_at IS NULL "
+                    + "ORDER BY u.created_at DESC";
 
     public static Long save(Url url) {
         var sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
@@ -41,7 +50,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static List<Url> getAll() {
-        var sql = "SELECT * FROM urls ORDER BY created_at DESC";
+        var sql = GET_ALL_URLS_SQL;
         try (var conn = getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             var resultSet = preparedStatement.executeQuery();
@@ -51,6 +60,12 @@ public class UrlRepository extends BaseRepository {
                 url.setId(resultSet.getLong("id"));
                 url.setName(resultSet.getString("name"));
                 url.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+                if (resultSet.getTimestamp("last_check") != null) {
+                    var check = new UrlCheck();
+                    check.setStatusCode(resultSet.getInt("status_code"));
+                    check.setCreatedAt(resultSet.getTimestamp("last_check").toLocalDateTime());
+                    url.getChecks().add(check);
+                }
                 res.add(url);
             }
             return res;

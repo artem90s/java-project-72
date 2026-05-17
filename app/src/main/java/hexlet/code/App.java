@@ -39,6 +39,7 @@ public class App {
         app.get("/", ctx -> ctx.render("index.jte"));
         app.get("/urls", UrlsController::getALl);
         app.get("/urls/{id}", UrlsController::getById);
+        app.post("/urls/{id}/checks", UrlsController::getChecks);
         app.post("/urls", UrlsController::add);
         log.info("Cоздан обьект Javalin");
         return app;

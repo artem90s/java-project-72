@@ -33,16 +33,17 @@ repositories {
 }
 
 dependencies {
+    implementation("com.konghq:unirest-java-core:4.5.1")
     implementation("com.h2database:h2:2.3.232")
     implementation("com.zaxxer:HikariCP:6.3.0")
     implementation("org.postgresql:postgresql:42.7.5")
-
+    implementation("org.projectlombok:lombok:1.18.22")
     implementation("gg.jte:jte:3.2.0")
     implementation("io.javalin:javalin:6.6.0")
     implementation("io.javalin:javalin-bundle:6.6.0")
     implementation("io.javalin:javalin-rendering:6.6.0")
-
-    implementation("org.projectlombok:lombok:1.18.22")
+    implementation ("org.jsoup:jsoup:1.22.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("org.assertj:assertj-core:3.27.3")
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")

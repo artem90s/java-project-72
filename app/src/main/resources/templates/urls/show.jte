@@ -42,14 +42,16 @@ content = @`
             </tr>
             </thead>
             <tbody>
+            @for(var check : page.getUrl().getChecks())
             <tr>
-                <td>1</td>
-                <td>200</td>
-                <td>...</td>
-                <td>...</td>
-                <td>...</td>
-                <td>2024-01-01</td>
+                <td>${check.getId()}</td>
+                <td>${check.getStatusCode()}</td>
+                <td >${check.getH1()}</td>
+                <td>${check.getTitle()}</td>
+                <td>${check.getDescription()}</td>
+                <td>${check.getCreatedAt().toLocalDate().toString()}</td>
             </tr>
+            @endfor
             </tbody>
         </table>
     </div>
