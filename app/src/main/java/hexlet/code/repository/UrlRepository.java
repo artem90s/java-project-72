@@ -4,7 +4,6 @@ import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -42,8 +41,6 @@ public class UrlRepository extends BaseRepository {
                 return id;
             }
             throw new RuntimeException("Не удалось получить id");
-        } catch (SQLIntegrityConstraintViolationException e) {
-            throw new RuntimeException("Страница уже существует");
         } catch (SQLException e) {
             throw new RuntimeException();
         }
@@ -83,6 +80,26 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 Url url = new Url();
                 url.setId(id);
+                url.setName(resultSet.getString("name"));
+                var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
+                url.setCreatedAt(createdAt);
+                return Optional.of(url);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<Url> finbByName(String name) {
+        var sql = "SELECT * FROM urls WHERE name = ?";
+        try (var conn = getDataSource().getConnection();
+             var stmnt = conn.prepareStatement(sql)) {
+            stmnt.setString(1, name);
+            var resultSet = stmnt.executeQuery();
+            if (resultSet.next()) {
+                Url url = new Url();
+                url.setId(resultSet.getLong("id"));
                 url.setName(resultSet.getString("name"));
                 var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
                 url.setCreatedAt(createdAt);
