@@ -18,6 +18,7 @@ import org.jsoup.nodes.Element;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -50,14 +51,15 @@ public class UrlsController {
             sb.append(":");
             sb.append(url.getPort());
         }
-        try {
-            var id = UrlRepository.save(new Url(sb.toString()));
-            context.sessionAttribute("flash", "Страница успешно добавлена");
-            context.redirect("/urls/" + id);
-        } catch (Exception e) {
-            page.setFlash(e.getMessage());
-            context.render("index.jte", model("page", page));
+        Optional<Url> urlExist = UrlRepository.finbByName(sb.toString());
+        if (urlExist.isPresent()) {
+            context.sessionAttribute("flash", "Страница уже существует");
+            context.redirect("/urls/" + urlExist.get().getId());
+            return;
         }
+        var id = UrlRepository.save(new Url(sb.toString()));
+        context.sessionAttribute("flash", "Страница успешно добавлена");
+        context.redirect("/urls/" + id);
     }
 
     public static void getById(@NotNull Context context) {
@@ -80,7 +82,8 @@ public class UrlsController {
         int status = response.getStatus();
         var page = new UrlPage(url);
         if (HttpStatus.forStatus(status).isClientError() || HttpStatus.forStatus(status).isServerError()) {
-            page.setFlash("Произошла ошибка при проверке");
+            context.sessionAttribute("flash", "Произошла ошибка при проверке");
+            context.redirect("/urls/" + id);
         } else if (HttpStatus.forStatus(status).isSuccess()) {
             var check = new UrlCheck();
             check.setUrlId(id);
@@ -92,8 +95,8 @@ public class UrlsController {
             Element metaDesc = doc.selectFirst("meta[name=description]");
             check.setDescription(metaDesc != null && metaDesc.hasAttr("content") ? metaDesc.attr("content") : "");
             UrlCheckRepository.save(check);
-            page.setFlash("Страница успешно проверена");
+            context.sessionAttribute("flash", "Страница успешно проверена");
+            context.redirect("/urls/" + id);
         }
-        context.render("urls/show.jte", model("page", page));
     }
 }

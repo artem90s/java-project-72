@@ -12,7 +12,4 @@ public class UrlPage extends BasePage {
     public UrlPage(Url url) {
         this.url = url;
     }
-
-    public UrlPage() {
-    }
 }

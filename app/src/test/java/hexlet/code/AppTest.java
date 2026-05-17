@@ -20,11 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AppTest {
     private Javalin app;
     private static MockWebServer mockServer;
+
     @BeforeAll
     public static void start() throws Exception {
         mockServer = new MockWebServer();
         mockServer.start();
     }
+
     @AfterAll
     public static void shutdown() throws Exception {
         mockServer.shutdown();
@@ -100,7 +102,7 @@ class AppTest {
 
     @Test
     public void checkUrlSuccess() {
-        MockResponse mockResponse  = new MockResponse().setResponseCode(HttpStatus.OK.getCode());
+        MockResponse mockResponse = new MockResponse().setResponseCode(HttpStatus.OK.getCode());
         mockServer.enqueue(mockResponse);
         var urlName = mockServer.url("/").toString();
         Url url = new Url(urlName);
@@ -128,6 +130,57 @@ class AppTest {
         var urlName = mockServer.url("/").toString();
         var response = Unirest.get(urlName).asString();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
+    }
+
+    @Test
+    public void testMultipleChecksForSameUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            String html = """
+                    <html>
+                        <head><title>First Check</title></head>
+                        <body><h1>First H1</h1></body>
+                    </html>
+                    """;
+
+            MockResponse mockResponse1 = new MockResponse()
+                    .setResponseCode(HttpStatus.OK.getCode())
+                    .setBody(html);
+            mockServer.enqueue(mockResponse1);
+
+            var urlName = mockServer.url("/").toString();
+            Url url = new Url(urlName);
+            Long id = UrlRepository.save(url);
+
+            client.post("/urls/" + id + "/checks");
+
+            String html2 = """
+                    <html>
+                        <head><title>Second Check</title></head>
+                        <body><h1>Second H1</h1></body>
+                    </html>
+                    """;
+            MockResponse mockResponse2 = new MockResponse()
+                    .setResponseCode(HttpStatus.OK.getCode())
+                    .setBody(html2);
+            mockServer.enqueue(mockResponse2);
+
+            client.post("/urls/" + id + "/checks");
+
+            var checks = UrlCheckRepository.findByUrlId(id);
+            assertThat(checks).hasSize(2);
+            assertThat(checks.get(0).getTitle()).isEqualTo("First Check");
+            assertThat(checks.get(1).getTitle()).isEqualTo("Second Check");
+        });
+    }
+
+    @Test
+    public void testGetAllWhenEmpty() {
+        JavalinTest.test(app, (server, client) -> {
+            var urls = UrlRepository.getAll();
+
+            assertThat(urls).isNotNull();
+            assertThat(urls).isEmpty();
+        });
     }
 }
 

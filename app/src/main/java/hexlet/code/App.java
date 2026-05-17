@@ -22,7 +22,6 @@ public class App {
         var app = getApp();
         app.start(getPort());
     }
-
     public static Javalin getApp() throws Exception {
         var dataBaseUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
         HikariConfig hikariConfig = new HikariConfig();
